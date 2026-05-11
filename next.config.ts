@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["arryvobase.com", "*.vercel.app"],
+    },
+  },
 };
 
 export default nextConfig;
