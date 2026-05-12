@@ -11,10 +11,11 @@ export default function SignUpPage() {
             </span>
           </a>
           <p className="mt-2 text-sm font-body" style={{ color: "#6B8BA8" }}>
-            Start your relocation journey — it&apos;s free
+            Start your relocation journey — it's free
           </p>
         </div>
         <SignUp
+          forceRedirectUrl="/dashboard"
           appearance={{
             elements: {
               rootBox: "w-full",
