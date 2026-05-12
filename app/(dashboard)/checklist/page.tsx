@@ -70,7 +70,7 @@ export default function ChecklistPage() {
                 <div className="space-y-3">
                   {phaseTasks.map((task, i) => {
                     const catMeta = CATEGORIES_META[task.category];
-                    const isDone = i < 2; // Mock completion state
+                    const isDone = false;
 
                     return (
                       <div key={task.id}
