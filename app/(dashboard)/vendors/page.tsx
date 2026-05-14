@@ -44,9 +44,9 @@ const DIRECTORY_VENDORS = [
 const getCatMeta = (cat: string) => CATEGORY_OPTIONS.find(c => c.value === cat) || CATEGORY_OPTIONS[CATEGORY_OPTIONS.length - 1];
 
 export default function VendorsPage() {
-  const [vendors, setVendors] = useState([]);
+  const [vendors, setVendors] = useState<any[]>([]);
   const [modal, setModal] = useState("none");
-  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [selectedVendor, setSelectedVendor] = useState<any>(null);
   const [dirFilter, setDirFilter] = useState("");
   const [form, setForm] = useState({ name: "", category: "Immigration Law", repName: "", phone: "", email: "", website: "", notes: "" });
 
