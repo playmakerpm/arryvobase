@@ -57,7 +57,7 @@ export default function VendorsPage() {
     } catch {}
   }, []);
 
-  const saveVendors = (updated) => {
+  const saveVendors = (updated: any[]) => {
     setVendors(updated);
     try { localStorage.setItem("arryvobase_vendors", JSON.stringify(updated)); } catch {}
   };
