@@ -41,7 +41,7 @@ const DIRECTORY_VENDORS = [
   { name: "Digi Spain", category: "Telecom", website: "https://digimobil.es" },
 ];
 
-const getCatMeta = (cat) => CATEGORY_OPTIONS.find(c => c.value === cat) || CATEGORY_OPTIONS[CATEGORY_OPTIONS.length - 1];
+const getCatMeta = (cat: string) => CATEGORY_OPTIONS.find(c => c.value === cat) || CATEGORY_OPTIONS[CATEGORY_OPTIONS.length - 1];
 
 export default function VendorsPage() {
   const [vendors, setVendors] = useState([]);
