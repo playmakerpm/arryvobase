@@ -1,156 +1,98 @@
+"use client";
+
+import { useState } from "react";
 import { VENDORS, VENDOR_CATEGORIES, CATEGORY_META } from "@/lib/data/vendors";
-import Link from "next/link";
 
 export default function DirectoryPage() {
-  const featured = VENDORS.filter((v) => v.featured);
-  const all = VENDORS;
+  const [activeFilter, setActiveFilter] = useState<string>("All");
+  const filtered = activeFilter === "All" ? VENDORS : VENDORS.filter((v) => v.category === activeFilter);
+  const featured = filtered.filter((v) => v.featured);
+  const rest = filtered.filter((v) => !v.featured);
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="text-sm font-body font-medium mb-1"
-          style={{ color: "#6B8BA8", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-          🇪🇸 Spain · Vetted Providers
-        </div>
-        <h1 className="font-display text-4xl font-semibold" style={{ color: "#083358" }}>
-          Vendor Directory
-        </h1>
-        <p className="mt-2 font-body text-sm" style={{ color: "#6B8BA8" }}>
-          Hand-curated providers for every stage of your Spain relocation. Recommended because they are good, not because they paid.
-        </p>
+    <div style={{ padding: "40px", maxWidth: "1000px", margin: "0 auto" }}>
+      <div style={{ marginBottom: "32px" }}>
+        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: ".15em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "8px" }}>🇪🇸 Spain · Vetted Providers</div>
+        <h1 style={{ fontFamily: "Georgia, serif", fontSize: "40px", fontWeight: 600, color: "#083358", letterSpacing: "-.02em", lineHeight: 1.1, marginBottom: "10px" }}>Vendor Directory</h1>
+        <p style={{ fontSize: "14px", color: "#6B8BA8", lineHeight: 1.6 }}>Hand-curated providers for your Spain relocation. Recommended because they are good, not because they paid.</p>
       </div>
 
-      {/* Category filters */}
-      <div className="flex gap-2 flex-wrap mb-8">
-        <button className="text-xs font-body font-semibold px-4 py-2 rounded-full text-white"
-          style={{ background: "#0569B8" }}>
-          All
+      {/* Filters */}
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "32px" }}>
+        <button onClick={() => setActiveFilter("All")} style={{ fontSize: "12px", fontWeight: 600, padding: "8px 18px", borderRadius: "20px", border: "none", cursor: "pointer", background: activeFilter === "All" ? "#0569B8" : "#EDF4FB", color: activeFilter === "All" ? "white" : "#2E4A68", transition: "all .15s" }}>
+          All ({VENDORS.length})
         </button>
         {VENDOR_CATEGORIES.map((cat) => {
           const meta = CATEGORY_META[cat];
+          const count = VENDORS.filter(v => v.category === cat).length;
           return (
-            <button key={cat}
-              className="text-xs font-body font-medium px-4 py-2 rounded-full transition-all"
-              style={{ background: meta.bg, color: meta.color, border: `1px solid ${meta.color}40` }}>
-              {meta.icon} {cat}
+            <button key={cat} onClick={() => setActiveFilter(cat)} style={{ fontSize: "12px", fontWeight: 600, padding: "8px 16px", borderRadius: "20px", border: `1px solid ${activeFilter === cat ? meta.color : "#C8DFF0"}`, cursor: "pointer", background: activeFilter === cat ? meta.bg : "white", color: activeFilter === cat ? meta.color : "#6B8BA8", transition: "all .15s" }}>
+              {meta.icon} {cat} ({count})
             </button>
           );
         })}
       </div>
 
-      {/* Featured vendors */}
-      <div className="mb-8">
-        <h2 className="font-body font-semibold text-sm mb-4 uppercase tracking-widest" style={{ color: "#6B8BA8" }}>
-          Featured
-        </h2>
-        <div className="grid grid-cols-2 gap-4">
-          {featured.map((vendor) => {
-            const meta = CATEGORY_META[vendor.category];
-            return (
-              <div key={vendor.id} className="rounded-2xl p-5"
-                style={{ background: "white", border: "1px solid #C8DFF0" }}>
-                {/* Category */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-body font-semibold px-2 py-1 rounded-full"
-                    style={{ background: meta.bg, color: meta.color }}>
-                    {meta.icon} {vendor.category}
-                  </span>
-                  <span className="text-xs font-body" style={{ color: "#6B8BA8" }}>
-                    {vendor.commissionValue}
-                  </span>
+      {/* Featured tiles */}
+      {featured.length > 0 && (
+        <div style={{ marginBottom: "40px" }}>
+          <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "16px" }}>Featured</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            {featured.map((vendor) => {
+              const meta = CATEGORY_META[vendor.category];
+              return (
+                <div key={vendor.id} style={{ background: "white", border: "1px solid #C8DFF0", borderRadius: "16px", padding: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <span style={{ fontSize: "11px", fontWeight: 700, padding: "4px 12px", borderRadius: "20px", background: meta.bg, color: meta.color, alignSelf: "flex-start" }}>{meta.icon} {vendor.category}</span>
+                  <div>
+                    <h3 style={{ fontFamily: "Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#083358", marginBottom: "6px" }}>{vendor.name}</h3>
+                    <p style={{ fontSize: "13px", color: "#6B8BA8", lineHeight: 1.65 }}>{vendor.description}</p>
+                  </div>
+                  <div style={{ padding: "10px 14px", borderRadius: "10px", background: "#EDF4FB", borderLeft: "3px solid #0569B8", fontSize: "12px", color: "#2E4A68", lineHeight: 1.6 }}>
+                    <strong>Why we recommend:</strong> {vendor.whyRecommended.slice(0, 120)}...
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    {vendor.tags.slice(0, 4).map((tag) => (
+                      <span key={tag} style={{ fontSize: "11px", padding: "3px 10px", borderRadius: "20px", background: "#EDF4FB", color: "#6B8BA8" }}>{tag}</span>
+                    ))}
+                  </div>
+                  <a href={vendor.affiliateLink} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", background: "linear-gradient(135deg, #0569B8, #00B9D1)", color: "white", padding: "12px", borderRadius: "10px", fontSize: "13px", fontWeight: 600, textDecoration: "none", marginTop: "auto" }}>
+                    Visit {vendor.name} →
+                  </a>
                 </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-                {/* Name */}
-                <h3 className="font-display text-xl font-semibold mb-2" style={{ color: "#083358" }}>
-                  {vendor.name}
-                </h3>
-                <p className="text-xs font-body leading-relaxed mb-4" style={{ color: "#6B8BA8" }}>
-                  {vendor.description}
-                </p>
-
-                {/* Why recommended */}
-                <div className="p-3 rounded-xl text-xs font-body mb-4"
-                  style={{ background: "#EDF4FB", color: "#2E4A68", borderLeft: "3px solid #0569B8" }}>
-                  <strong>Why we recommend:</strong> {vendor.whyRecommended.slice(0, 100)}...
-                </div>
-
-                {/* Tags */}
-                <div className="flex gap-1 flex-wrap mb-4">
-                  {vendor.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="text-xs px-2 py-0.5 rounded-full font-body"
-                      style={{ background: "#EDF4FB", color: "#6B8BA8" }}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <a href={vendor.affiliateLink} target="_blank" rel="noopener noreferrer"
-                    className="flex-1 text-center text-xs font-body font-semibold py-2 rounded-lg text-white transition-all"
-                    style={{ background: "#0569B8" }}>
+      {/* All providers */}
+      {rest.length > 0 && (
+        <div>
+          <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "16px" }}>
+            {activeFilter === "All" ? "All Providers" : activeFilter}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px" }}>
+            {rest.map((vendor) => {
+              const meta = CATEGORY_META[vendor.category];
+              return (
+                <div key={vendor.id} style={{ background: "white", border: "1px solid #C8DFF0", borderRadius: "14px", padding: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: meta.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", flexShrink: 0 }}>{meta.icon}</div>
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: "#083358" }}>{vendor.name}</div>
+                      <div style={{ fontSize: "11px", color: meta.color, fontWeight: 600 }}>{vendor.category}</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: "12px", color: "#6B8BA8", lineHeight: 1.6 }}>{vendor.description.slice(0, 90)}...</p>
+                  <a href={vendor.affiliateLink} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", background: "#EDF4FB", color: "#0569B8", padding: "8px", borderRadius: "8px", fontSize: "12px", fontWeight: 600, textDecoration: "none", border: "1px solid #C8DFF0", marginTop: "auto" }}>
                     Visit Provider →
                   </a>
-                  <button className="text-xs font-body font-semibold py-2 px-3 rounded-lg transition-all"
-                    style={{ background: "#EDF4FB", color: "#0569B8", border: "1px solid #C8DFF0" }}>
-                    + Save
-                  </button>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
-
-      {/* All vendors list */}
-      <div>
-        <h2 className="font-body font-semibold text-sm mb-4 uppercase tracking-widest" style={{ color: "#6B8BA8" }}>
-          All Providers
-        </h2>
-        <div className="space-y-3">
-          {all.map((vendor) => {
-            const meta = CATEGORY_META[vendor.category];
-            return (
-              <div key={vendor.id}
-                className="flex items-center gap-4 p-4 rounded-xl"
-                style={{ background: "white", border: "1px solid #C8DFF0" }}>
-                <div className="w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center text-xl"
-                  style={{ background: meta.bg }}>
-                  {meta.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="font-body font-semibold text-sm" style={{ color: "#083358" }}>
-                      {vendor.name}
-                    </span>
-                    {vendor.featured && (
-                      <span className="text-xs font-body px-1.5 py-0.5 rounded"
-                        style={{ background: "#EDF4FB", color: "#0569B8" }}>
-                        Featured
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs font-body" style={{ color: "#6B8BA8" }}>
-                    {vendor.category} · {vendor.description.slice(0, 80)}...
-                  </div>
-                </div>
-                <div className="flex gap-2 flex-shrink-0">
-                  <a href={vendor.affiliateLink} target="_blank" rel="noopener noreferrer"
-                    className="text-xs font-body font-semibold py-1.5 px-3 rounded-lg text-white"
-                    style={{ background: "#0569B8" }}>
-                    Visit
-                  </a>
-                  <button className="text-xs font-body font-semibold py-1.5 px-3 rounded-lg"
-                    style={{ background: "#EDF4FB", color: "#0569B8", border: "1px solid #C8DFF0" }}>
-                    + Save
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
