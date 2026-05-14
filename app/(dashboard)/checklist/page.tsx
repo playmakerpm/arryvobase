@@ -9,8 +9,20 @@ export default function ChecklistPage() {
   const userTasks = TASKS.filter((t) => t.visaTypes.includes(userVisa)).sort((a, b) => a.order - b.order);
   const freePhases = ["before"];
   const phases = Object.values(PHASES_META);
-  const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const toggleTask = (id: string) => setChecked((prev) => ({ ...prev, [id]: !prev[id] }));
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const saved = localStorage.getItem("arryvobase_checklist");
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+  const toggleTask = (id: string) => {
+    setChecked((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      try { localStorage.setItem("arryvobase_checklist", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
   const totalFree = userTasks.filter(t => freePhases.includes(t.phase)).length;
   const totalDone = Object.values(checked).filter(Boolean).length;
 
