@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { supabaseAdmin } from "@/lib/supabase";
 import Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
@@ -21,15 +22,27 @@ export async function POST(req: NextRequest) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
-      // TODO: Update user's subscription status in your database
-      console.log("User upgraded to Pro:", userId);
+      if (userId) {
+        await supabaseAdmin
+          .from("users")
+          .upsert({
+            clerk_user_id: userId,
+            plan: "pro",
+            stripe_customer_id: session.customer as string,
+            stripe_subscription_id: session.subscription as string,
+          }, { onConflict: "clerk_user_id" });
+      }
       break;
     }
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       const userId = subscription.metadata?.userId;
-      // TODO: Downgrade user to free tier
-      console.log("User subscription cancelled:", userId);
+      if (userId) {
+        await supabaseAdmin
+          .from("users")
+          .update({ plan: "free" })
+          .eq("clerk_user_id", userId);
+      }
       break;
     }
   }

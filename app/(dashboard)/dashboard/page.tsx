@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 const QUICK_TILES = [
   { href: "/checklist", icon: "✓", title: "Relocation Checklist", desc: "Track every step of your Spain move — visa, housing, banking, school.", color: "#0569B8", bg: "linear-gradient(135deg, #EDF4FB, #D4E9F7)", tag: "7 tasks available", locked: false },
@@ -23,34 +24,44 @@ const PHASES = [
 const TOTAL_FREE = 7;
 const TOTAL_TASKS = 22;
 
-export default function DashboardPage() {
+export default function DashboardPage({ searchParams }: { searchParams: any }) {
   const { user } = useUser();
   const firstName = user?.firstName || "there";
   const [completedCount, setCompletedCount] = useState(0);
+  const [isPro, setIsPro] = useState(false);
 
   useEffect(() => {
-    // Read checklist progress from localStorage
-    const readProgress = () => {
-      try {
-        const saved = localStorage.getItem("arryvobase_checklist");
-        if (saved) {
-          const checked = JSON.parse(saved);
-          const count = Object.values(checked).filter(Boolean).length;
-          setCompletedCount(count);
-        }
-      } catch {}
+    if (!user) return;
+    const load = async () => {
+      // Load checklist progress
+      const { data: progress } = await supabase
+        .from("checklist_progress")
+        .select("task_id, completed")
+        .eq("clerk_user_id", user.id)
+        .eq("completed", true);
+      if (progress) setCompletedCount(progress.length);
+
+      // Load user plan
+      const { data: userData } = await supabase
+        .from("users")
+        .select("plan")
+        .eq("clerk_user_id", user.id)
+        .single();
+      if (userData) setIsPro(userData.plan === "pro");
     };
-    readProgress();
-    // Re-read when window gets focus (user returns from checklist)
-    window.addEventListener("focus", readProgress);
-    return () => window.removeEventListener("focus", readProgress);
-  }, []);
+    load();
+  }, [user]);
 
   const progressPct = TOTAL_FREE > 0 ? Math.round((completedCount / TOTAL_FREE) * 100) : 0;
 
   return (
     <div style={{ padding: "40px 48px", maxWidth: "1100px", margin: "0 auto" }}>
-      {/* Header */}
+      {searchParams?.upgraded && (
+        <div style={{ marginBottom: "24px", padding: "16px 20px", borderRadius: "12px", background: "linear-gradient(135deg, #0569B8, #00B9D1)", color: "white", fontSize: "14px", fontWeight: 600 }}>
+          🎉 Welcome to Arryvo Base Pro! All features are now unlocked.
+        </div>
+      )}
+
       <div style={{ marginBottom: "32px" }}>
         <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: ".18em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "8px" }}>Your Command Center</div>
         <h1 style={{ fontFamily: "Georgia, serif", fontSize: "52px", fontWeight: 600, color: "#083358", letterSpacing: "-.025em", lineHeight: 1.05, marginBottom: "10px" }}>
@@ -61,7 +72,6 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Progress banner */}
       <div style={{ borderRadius: "20px", padding: "28px 32px", marginBottom: "32px", background: "linear-gradient(135deg, #083358 0%, #0569B8 60%, #00B9D1 100%)", color: "white", display: "grid", gridTemplateColumns: "1fr 200px", gap: "32px", alignItems: "center" }}>
         <div>
           <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(200,238,245,.6)", marginBottom: "8px" }}>
@@ -71,35 +81,31 @@ export default function DashboardPage() {
             <div style={{ fontFamily: "Georgia, serif", fontSize: "52px", fontWeight: 600, lineHeight: 1, color: "#5DD3E3" }}>{progressPct}%</div>
             <div>
               <div style={{ fontSize: "15px", fontWeight: 600, color: "white", marginBottom: "3px" }}>{completedCount} of {TOTAL_FREE} tasks complete</div>
-              <div style={{ fontSize: "12px", color: "rgba(200,238,245,.55)" }}>Upgrade to unlock all {TOTAL_TASKS} tasks across all phases</div>
+              <div style={{ fontSize: "12px", color: "rgba(200,238,245,.55)" }}>
+                {isPro ? "Pro plan active ✓" : `Upgrade to unlock all ${TOTAL_TASKS} tasks`}
+              </div>
             </div>
           </div>
           <div style={{ height: "8px", background: "rgba(255,255,255,.15)", borderRadius: "4px", overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${progressPct}%`, background: "linear-gradient(90deg, #5DD3E3, #C8EEF5)", borderRadius: "4px", transition: "width .6s ease" }} />
           </div>
-          {progressPct === 100 && (
-            <div style={{ marginTop: "10px", fontSize: "13px", color: "#5DD3E3", fontWeight: 600 }}>
-              ✓ Before You Leave phase complete! Upgrade to continue.
-            </div>
-          )}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {PHASES.map((p) => (
             <div key={p.label} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: p.locked ? "rgba(255,255,255,.2)" : p.color, flexShrink: 0 }} />
-              <div style={{ fontSize: "12px", color: p.locked ? "rgba(255,255,255,.3)" : "rgba(200,238,245,.9)", flex: 1 }}>{p.label}</div>
-              {p.locked && <span style={{ fontSize: "10px", color: "rgba(255,255,255,.25)" }}>🔒</span>}
+              <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: p.locked && !isPro ? "rgba(255,255,255,.2)" : p.color, flexShrink: 0 }} />
+              <div style={{ fontSize: "12px", color: p.locked && !isPro ? "rgba(255,255,255,.3)" : "rgba(200,238,245,.9)", flex: 1 }}>{p.label}</div>
+              {p.locked && !isPro && <span style={{ fontSize: "10px", color: "rgba(255,255,255,.25)" }}>🔒</span>}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Tiles */}
       <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "14px" }}>Quick Access</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridTemplateRows: "auto auto", gap: "14px", marginBottom: "28px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "14px", marginBottom: "28px" }}>
         {QUICK_TILES.map((tile) => (
           <Link key={tile.href} href={tile.href} style={{ textDecoration: "none", display: "block" }}>
-            <div style={{ background: tile.bg, borderRadius: "16px", padding: "22px", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid rgba(200,222,240,.6)", height: "100%", minHeight: "172px", boxSizing: "border-box" }}>
+            <div style={{ background: tile.bg, borderRadius: "16px", padding: "22px", display: "flex", flexDirection: "column", gap: "10px", border: "1px solid rgba(200,222,240,.6)", minHeight: "172px", boxSizing: "border-box" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ width: "42px", height: "42px", borderRadius: "11px", background: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", boxShadow: "0 2px 8px rgba(0,0,0,.06)", flexShrink: 0 }}>{tile.icon}</div>
                 <span style={{ fontSize: "10px", fontWeight: 700, padding: "4px 10px", borderRadius: "20px", background: "rgba(255,255,255,.75)", color: tile.color, letterSpacing: ".06em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{tile.tag}</span>
@@ -109,23 +115,24 @@ export default function DashboardPage() {
                 <div style={{ fontSize: "13px", color: "#2E4A68", lineHeight: 1.6, fontWeight: 300 }}>{tile.desc}</div>
               </div>
               <div style={{ fontSize: "12px", fontWeight: 600, color: tile.color }}>
-                {tile.locked ? "Upgrade to unlock →" : "Open →"}
+                {tile.locked && !isPro ? "Upgrade to unlock →" : "Open →"}
               </div>
             </div>
           </Link>
         ))}
       </div>
 
-      {/* Upgrade strip */}
-      <div style={{ borderRadius: "16px", padding: "22px 28px", background: "linear-gradient(135deg, #020D1C, #083358)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "24px" }}>
-        <div>
-          <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#C8EEF5", marginBottom: "4px" }}>Unlock your full relocation plan</div>
-          <div style={{ fontSize: "13px", color: "rgba(200,238,245,.45)", fontWeight: 300 }}>All phases · Document vault · Portugal, Mexico & Thailand</div>
+      {!isPro && (
+        <div style={{ borderRadius: "16px", padding: "22px 28px", background: "linear-gradient(135deg, #020D1C, #083358)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "24px" }}>
+          <div>
+            <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", fontWeight: 600, color: "#C8EEF5", marginBottom: "4px" }}>Unlock your full relocation plan</div>
+            <div style={{ fontSize: "13px", color: "rgba(200,238,245,.45)", fontWeight: 300 }}>All phases · Document vault · Portugal, Mexico & Thailand</div>
+          </div>
+          <Link href="/upgrade" style={{ flexShrink: 0, background: "linear-gradient(135deg, #0569B8, #00B9D1)", color: "white", padding: "12px 28px", borderRadius: "10px", fontSize: "13px", fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+            Upgrade to Pro — $19/mo
+          </Link>
         </div>
-        <Link href="/upgrade" style={{ flexShrink: 0, background: "linear-gradient(135deg, #0569B8, #00B9D1)", color: "white", padding: "12px 28px", borderRadius: "10px", fontSize: "13px", fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
-          Upgrade to Pro — $19/mo
-        </Link>
-      </div>
+      )}
     </div>
   );
 }

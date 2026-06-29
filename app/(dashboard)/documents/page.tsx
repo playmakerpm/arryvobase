@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { supabase } from "@/lib/supabase";
+import { useUser } from "@clerk/nextjs";
 
 const DOC_CATEGORIES = [
   { value: "Passport & ID", icon: "🛂", color: "#0569B8", bg: "#EDF4FB" },
@@ -38,16 +40,23 @@ export default function DocumentsPage() {
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef(null);
 
+  const { user } = useUser();
+
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("arryvobase_docs");
-      if (saved) setDocs(JSON.parse(saved));
-    } catch {}
-  }, []);
+    if (!user) return;
+    const load = async () => {
+      const { data } = await supabase
+        .from("user_documents")
+        .select("*")
+        .eq("clerk_user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (data) setDocs(data);
+    };
+    load();
+  }, [user]);
 
   const saveDocs = (updated) => {
     setDocs(updated);
-    try { localStorage.setItem("arryvobase_docs", JSON.stringify(updated)); } catch {}
   };
 
   const handleFile = (file) => {
@@ -62,25 +71,25 @@ export default function DocumentsPage() {
     if (file) handleFile(file);
   };
 
-  const addDoc = () => {
-    if (!form.name.trim()) return;
-    const newDoc = {
-      id: Date.now().toString(),
+  const addDoc = async () => {
+    if (!user || !form.name.trim()) return;
+    const { data } = await supabase.from("user_documents").insert({
+      clerk_user_id: user.id,
       name: form.name,
       category: form.category,
       notes: form.notes,
-      fileName: form.fileName,
-      fileSize: form.fileSize,
-      fileType: form.fileType,
-      addedAt: new Date().toISOString(),
-    };
-    saveDocs([...docs, newDoc]);
+      file_name: form.fileName,
+      file_size: form.fileSize,
+      file_type: form.fileType,
+    }).select().single();
+    if (data) setDocs((prev) => [data, ...prev]);
     setModal("none");
     setForm({ name: "", category: "Passport & ID", notes: "", fileName: "", fileSize: 0, fileType: "" });
   };
 
-  const removeDoc = (id) => {
-    saveDocs(docs.filter(d => d.id !== id));
+  const removeDoc = async (id) => {
+    await supabase.from("user_documents").delete().eq("id", id);
+    setDocs((prev) => prev.filter((d) => d.id !== id));
     setSelectedDoc(null);
     setModal("none");
   };
@@ -134,11 +143,11 @@ export default function DocumentsPage() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontFamily: "Georgia, serif", fontSize: "16px", fontWeight: 600, color: "#083358", lineHeight: 1.25, marginBottom: "4px" }}>{doc.name}</div>
-                {doc.fileName && <div style={{ fontSize: "12px", color: "#6B8BA8", marginBottom: "2px" }}>📎 {doc.fileName}</div>}
-                {doc.fileSize > 0 && <div style={{ fontSize: "11px", color: "#C8DFF0" }}>{formatSize(doc.fileSize)}</div>}
+                {doc.file_name && <div style={{ fontSize: "12px", color: "#6B8BA8", marginBottom: "2px" }}>📎 {doc.file_name}</div>}
+                {doc.file_size > 0 && <div style={{ fontSize: "11px", color: "#C8DFF0" }}>{formatSize(doc.file_size)}</div>}
               </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ fontSize: "11px", color: "#C8DFF0" }}>{formatDate(doc.addedAt)}</div>
+                <div style={{ fontSize: "11px", color: "#C8DFF0" }}>{formatDate(doc.created_at)}</div>
                 <div style={{ fontSize: "12px", color: "#6B8BA8", fontWeight: 500 }}>View →</div>
               </div>
             </div>
@@ -245,18 +254,18 @@ export default function DocumentsPage() {
                   </div>
                 </div>
                 <div style={{ overflowY: "auto", flex: 1, padding: "20px 28px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {selectedDoc.fileName && (
+                  {selectedDoc.file_name && (
                     <div style={{ display: "flex", gap: "12px", padding: "14px 16px", background: "#EDF4FB", borderRadius: "10px", alignItems: "center" }}>
                       <span style={{ fontSize: "24px" }}>📎</span>
                       <div>
-                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#083358" }}>{selectedDoc.fileName}</div>
-                        {selectedDoc.fileSize > 0 && <div style={{ fontSize: "12px", color: "#6B8BA8" }}>{formatSize(selectedDoc.fileSize)}</div>}
+                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#083358" }}>{selectedDoc.file_name}</div>
+                        {selectedDoc.file_size > 0 && <div style={{ fontSize: "12px", color: "#6B8BA8" }}>{formatSize(selectedDoc.file_size)}</div>}
                       </div>
                     </div>
                   )}
                   <div style={{ display: "flex", gap: "12px", padding: "12px 16px", background: "#EDF4FB", borderRadius: "10px" }}>
                     <span style={{ fontSize: "12px", color: "#6B8BA8", width: "80px", flexShrink: 0 }}>Added</span>
-                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#083358" }}>{formatDate(selectedDoc.addedAt)}</span>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "#083358" }}>{formatDate(selectedDoc.created_at)}</span>
                   </div>
                   {selectedDoc.notes && (
                     <div style={{ padding: "14px 16px", background: "#EDF4FB", borderRadius: "10px" }}>

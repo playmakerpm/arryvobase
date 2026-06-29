@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { useUser } from "@clerk/nextjs";
 
 const CATEGORY_OPTIONS = [
   { value: "Immigration Law", icon: "⚖️", color: "#0569B8", bg: "#EDF4FB" },
@@ -51,16 +53,23 @@ export default function VendorsPage() {
   const [dirFilter, setDirFilter] = useState("");
   const [form, setForm] = useState({ name: "", category: "Immigration Law", repName: "", phone: "", email: "", website: "", notes: "" });
 
+  const { user } = useUser();
+
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("arryvobase_vendors");
-      if (saved) setVendors(JSON.parse(saved));
-    } catch {}
-  }, []);
+    if (!user) return;
+    const load = async () => {
+      const { data } = await supabase
+        .from("user_vendors")
+        .select("*")
+        .eq("clerk_user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (data) setVendors(data);
+    };
+    load();
+  }, [user]);
 
   const saveVendors = (updated: any[]) => {
     setVendors(updated);
-    try { localStorage.setItem("arryvobase_vendors", JSON.stringify(updated)); } catch {}
   };
 
   const addFromDirectory = (dv) => {
@@ -70,10 +79,21 @@ export default function VendorsPage() {
     setDirFilter("");
   };
 
-  const addManual = () => {
-    if (!form.name.trim()) return;
-    const newVendor = { id: Date.now().toString(), ...form, status: "Researching", fromDirectory: false, addedAt: new Date().toISOString() };
-    saveVendors([...vendors, newVendor]);
+  const addManual = async () => {
+    if (!user || !form.name.trim()) return;
+    const { data } = await supabase.from("user_vendors").insert({
+      clerk_user_id: user.id,
+      name: form.name,
+      category: form.category,
+      status: "Researching",
+      rep_name: form.repName,
+      phone: form.phone,
+      email: form.email,
+      website: form.website,
+      notes: form.notes,
+      from_directory: false,
+    }).select().single();
+    if (data) setVendors((prev: any[]) => [data, ...prev]);
     setModal("none");
     setForm({ name: "", category: "Immigration Law", repName: "", phone: "", email: "", website: "", notes: "" });
   };
@@ -91,7 +111,7 @@ export default function VendorsPage() {
   };
 
   const closeModal = () => { setModal("none"); setSelectedVendor(null); setDirFilter(""); };
-  const alreadySaved = new Set(vendors.filter(v => v.fromDirectory).map(v => v.name));
+  const alreadySaved = new Set(vendors.filter(v => v.from_directory).map(v => v.name));
   const filteredDir = DIRECTORY_VENDORS.filter(v => v.name.toLowerCase().includes(dirFilter.toLowerCase()) || v.category.toLowerCase().includes(dirFilter.toLowerCase()));
 
   return (

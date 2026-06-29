@@ -1,30 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TASKS, PHASES_META, CATEGORIES_META } from "@/lib/data/checklist";
+import { supabase } from "@/lib/supabase";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
 export default function ChecklistPage() {
+  const { user } = useUser();
   const userVisa = "ICT" as const;
   const userTasks = TASKS.filter((t) => t.visaTypes.includes(userVisa)).sort((a, b) => a.order - b.order);
   const freePhases = ["before"];
   const phases = Object.values(PHASES_META);
-  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {};
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [loading, setLoading] = useState(true);
+
+  // Load from Supabase
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      const { data } = await supabase
+        .from("checklist_progress")
+        .select("task_id, completed")
+        .eq("clerk_user_id", user.id);
+      if (data) {
+        const map: Record<string, boolean> = {};
+        data.forEach((row: any) => { map[row.task_id] = row.completed; });
+        setChecked(map);
+      }
+      setLoading(false);
+    };
+    load();
+  }, [user]);
+
+  const toggleTask = async (id: string) => {
+    if (!user) return;
+    const newVal = !checked[id];
+    setChecked((prev) => ({ ...prev, [id]: newVal }));
+
+    // Upsert to Supabase
+    await supabase.from("checklist_progress").upsert({
+      clerk_user_id: user.id,
+      task_id: id,
+      completed: newVal,
+      completed_at: newVal ? new Date().toISOString() : null,
+    }, { onConflict: "clerk_user_id,task_id" });
+
+    // Also keep localStorage in sync for dashboard progress bar
     try {
-      const saved = localStorage.getItem("arryvobase_checklist");
-      return saved ? JSON.parse(saved) : {};
-    } catch { return {}; }
-  });
-  const toggleTask = (id: string) => {
-    setChecked((prev) => {
-      const next = { ...prev, [id]: !prev[id] };
-      try { localStorage.setItem("arryvobase_checklist", JSON.stringify(next)); } catch {}
-      return next;
-    });
+      const current = JSON.parse(localStorage.getItem("arryvobase_checklist") || "{}");
+      current[id] = newVal;
+      localStorage.setItem("arryvobase_checklist", JSON.stringify(current));
+    } catch {}
   };
+
   const totalFree = userTasks.filter(t => freePhases.includes(t.phase)).length;
   const totalDone = Object.values(checked).filter(Boolean).length;
+
+  if (loading) return (
+    <div style={{ padding: "40px 48px", display: "flex", alignItems: "center", justifyContent: "center", minHeight: "400px" }}>
+      <div style={{ fontFamily: "Georgia, serif", fontSize: "18px", color: "#6B8BA8" }}>Loading your checklist...</div>
+    </div>
+  );
 
   return (
     <div style={{ padding: "40px", maxWidth: "900px", margin: "0 auto" }}>

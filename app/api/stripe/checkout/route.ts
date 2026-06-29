@@ -1,6 +1,7 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { stripe, STRIPE_PRICE_ID, APP_URL } from "@/lib/stripe";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { supabaseAdmin, getOrCreateUser } from "@/lib/supabase";
 
 export async function POST() {
   try {
@@ -11,6 +12,9 @@ export async function POST() {
 
     const user = await currentUser();
     const email = user?.emailAddresses?.[0]?.emailAddress;
+
+    // Ensure user exists in Supabase
+    await getOrCreateUser(userId, email);
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
