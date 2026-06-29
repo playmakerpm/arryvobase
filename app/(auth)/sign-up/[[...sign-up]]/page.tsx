@@ -26,8 +26,8 @@ export default function SignUpPage() {
           {/* Social proof */}
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             {[
-              { icon: "✓", text: "Personalized Spain relocation checklist" },
-              { icon: "✓", text: "14 vetted lawyers, banks, and insurers" },
+              { icon: "✓", text: "Personalized relocation checklist for every destination" },
+              { icon: "✓", text: "Lawyers, banks, insurers, and relocation specialists" },
               { icon: "✓", text: "Beckham Law, NIE, and housing guidance" },
               { icon: "✓", text: "Free to start — no credit card needed" },
             ].map((item) => (
@@ -54,7 +54,7 @@ export default function SignUpPage() {
               Create your account
             </h2>
             <p style={{ fontSize: "14px", color: "#6B8BA8", fontWeight: 300 }}>
-              Free forever. Upgrade anytime for $19/month.
+              Start for free. Upgrade anytime for $19/month.
             </p>
           </div>
           <SignUp
