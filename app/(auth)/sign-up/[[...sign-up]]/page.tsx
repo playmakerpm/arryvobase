@@ -57,6 +57,11 @@ export default function SignUpPage() {
               Start for free. Upgrade anytime for $19/month.
             </p>
           </div>
+          {/* Age verification notice */}
+          <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "10px", background: "#EDF4FB", border: "1px solid #C8DFF0", fontSize: "13px", color: "#2E4A68", lineHeight: 1.6 }}>
+            By creating an account you confirm that you are <strong>18 years of age or older</strong> and agree to our Terms of Service and Privacy Policy.
+          </div>
+
           <SignUp
             forceRedirectUrl="/onboarding"
             appearance={{
