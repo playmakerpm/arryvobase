@@ -1,18 +1,17 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey;
 
-// Client for browser usage
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error("Missing Supabase environment variables");
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Admin client for server-side usage (bypasses RLS)
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-// Helper to get or create a user record
 export async function getOrCreateUser(clerkUserId: string, email?: string) {
-  // Check if user exists
   const { data: existing } = await supabaseAdmin
     .from("users")
     .select("*")
@@ -21,10 +20,8 @@ export async function getOrCreateUser(clerkUserId: string, email?: string) {
 
   if (existing) return existing;
 
-  // Generate referral code
   const referralCode = `ref_${clerkUserId.slice(-8)}_${Date.now().toString(36)}`;
 
-  // Create new user
   const { data: newUser, error } = await supabaseAdmin
     .from("users")
     .insert({
@@ -39,7 +36,6 @@ export async function getOrCreateUser(clerkUserId: string, email?: string) {
   return newUser;
 }
 
-// Helper to check if user is Pro
 export async function isUserPro(clerkUserId: string): Promise<boolean> {
   const { data } = await supabaseAdmin
     .from("users")
