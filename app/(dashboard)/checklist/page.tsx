@@ -221,19 +221,19 @@ export default function ChecklistPage() {
 
         {/* Add Task Form */}
         {showAddForm && (
-          <div style={{ background: "white", border: "1px solid #C8DFF0", borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+          <div style={{ background: "white", border: "1px solid #C8DFF0", borderRadius: "16px", padding: "24px", marginBottom: "16px", boxSizing: "border-box", width: "100%" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px", boxSizing: "border-box" }}>
               <div style={{ gridColumn: "1 / -1" }}>
                 <label style={{ display: "block", fontSize: "11px", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "6px" }}>Task Title *</label>
                 <input type="text" placeholder="e.g. Schedule NIE appointment" value={newTask.title}
                   onChange={e => setNewTask(p => ({ ...p, title: e.target.value }))}
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit" }} />
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "1 / -1" }}>
                 <label style={{ display: "block", fontSize: "11px", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "6px" }}>Details</label>
                 <textarea placeholder="Any notes or details about this task..." value={newTask.details}
                   onChange={e => setNewTask(p => ({ ...p, details: e.target.value }))}
-                  rows={2} style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit", resize: "vertical" }} />
+                  rows={2} style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} />
               </div>
               <div style={{ gridColumn: "1 / 2" }}>
                 <label style={{ display: "block", fontSize: "11px", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "6px" }}>Due Date</label>
