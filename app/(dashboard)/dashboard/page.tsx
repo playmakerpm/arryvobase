@@ -33,6 +33,18 @@ export default function DashboardPage({ searchParams }: { searchParams: any }) {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
+      // If returning from successful Stripe checkout, update plan to pro
+      if (searchParams?.upgraded) {
+        await supabase
+          .from("users")
+          .upsert({
+            clerk_user_id: user.id,
+            email: user.emailAddresses?.[0]?.emailAddress || "",
+            plan: "pro",
+          }, { onConflict: "clerk_user_id" });
+        setIsPro(true);
+      }
+
       // Load checklist progress
       const { data: progress } = await supabase
         .from("checklist_progress")
