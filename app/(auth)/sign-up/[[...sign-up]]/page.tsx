@@ -59,7 +59,7 @@ export default function SignUpPage() {
           </div>
           {/* Age verification notice */}
           <div style={{ marginBottom: "16px", padding: "12px 16px", borderRadius: "10px", background: "#EDF4FB", border: "1px solid #C8DFF0", fontSize: "13px", color: "#2E4A68", lineHeight: 1.6 }}>
-            By creating an account you confirm that you are <strong>18 years of age or older</strong> and agree to our Terms of Service and Privacy Policy.
+            By creating an account you confirm that you are <strong>18 years of age or older</strong> and agree to our <a href="/terms" style={{ color: "#0569B8", fontWeight: 600 }}>Terms of Service</a> and <a href="/privacy" style={{ color: "#0569B8", fontWeight: 600 }}>Privacy Policy</a>.
           </div>
 
           <SignUp
