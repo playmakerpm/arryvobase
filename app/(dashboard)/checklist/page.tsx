@@ -10,15 +10,32 @@ export default function ChecklistPage() {
   const { user } = useUser();
   const userVisa = "ICT" as const;
   const userTasks = TASKS.filter((t) => t.visaTypes.includes(userVisa)).sort((a, b) => a.order - b.order);
-  const freePhases = ["before"];
   const phases = Object.values(PHASES_META);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [isPro, setIsPro] = useState(false);
+
+  const freePhases = isPro ? ["before", "first30", "first90", "ongoing"] : ["before"];
 
   // Load from Supabase
   useEffect(() => {
     if (!user) return;
     const load = async () => {
+      // Check Pro status
+      const urlParams = new URLSearchParams(window.location.search);
+      const upgraded = urlParams.get("upgraded");
+      if (upgraded === "true") {
+        setIsPro(true);
+      } else {
+        const { data: userData } = await supabase
+          .from("users")
+          .select("plan")
+          .eq("clerk_user_id", user.id)
+          .single();
+        if (userData?.plan === "pro") setIsPro(true);
+      }
+
+      // Load checklist progress
       const { data } = await supabase
         .from("checklist_progress")
         .select("task_id, completed")
@@ -74,7 +91,7 @@ export default function ChecklistPage() {
           </div>
           <div style={{ fontSize: "13px", fontWeight: 600, color: "#0569B8", whiteSpace: "nowrap" }}>{totalDone}/{totalFree} complete</div>
         </div>
-        <div style={{ fontSize: "13px", color: "#6B8BA8" }}>{totalFree} tasks on Free plan · <Link href="/upgrade" style={{ color: "#0569B8", fontWeight: 600 }}>Upgrade to unlock all {userTasks.length} tasks</Link></div>
+        <div style={{ fontSize: "13px", color: "#6B8BA8" }}>{isPro ? `All ${userTasks.length} tasks unlocked` : `${totalFree} tasks on Free plan · `}{!isPro && <Link href="/upgrade" style={{ color: "#0569B8", fontWeight: 600 }}>Upgrade to unlock all {userTasks.length} tasks</Link>}</div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
