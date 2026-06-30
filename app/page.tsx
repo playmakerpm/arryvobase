@@ -117,7 +117,7 @@ export default function HomePage() {
             {/* Connector line */}
             <div style={{ position: "absolute", top: "40px", left: "calc(16.67% + 20px)", right: "calc(16.67% + 20px)", height: "1px", background: "linear-gradient(90deg, #C8DFF0, #0569B8, #C8DFF0)", zIndex: 0 }} />
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "32px", position: "relative", zIndex: 1 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", position: "relative", zIndex: 1, boxSizing: "border-box" }}>
               {[
                 {
                   n: "01",
@@ -147,7 +147,7 @@ export default function HomePage() {
                   tag: "Stay organized",
                 },
               ].map((s) => (
-                <div key={s.n} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+                <div key={s.n} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", minWidth: 0 }}>
                   {/* Step circle */}
                   <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: s.bg, border: `2px solid ${s.color}30`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "28px", position: "relative", boxShadow: `0 0 0 8px ${s.bg}` }}>
                     <span style={{ fontSize: "32px" }}>{s.icon}</span>
@@ -157,7 +157,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Card */}
-                  <div style={{ background: "white", border: "1px solid #C8DFF0", borderRadius: "16px", padding: "28px 24px", width: "100%", boxShadow: "0 4px 24px rgba(5,105,184,.06)" }}>
+                  <div style={{ background: "white", border: "1px solid #C8DFF0", borderRadius: "16px", padding: "24px 20px", width: "100%", boxShadow: "0 4px 24px rgba(5,105,184,.06)", boxSizing: "border-box" }}>
                     <div style={{ display: "inline-block", fontSize: "10px", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: s.color, background: s.bg, padding: "4px 10px", borderRadius: "20px", marginBottom: "14px" }}>
                       {s.tag}
                     </div>
