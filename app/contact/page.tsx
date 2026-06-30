@@ -1,5 +1,5 @@
-import Footer from "@/components/footer";
 "use client";
+import Footer from "@/components/footer";
 
 import { useState } from "react";
 
