@@ -235,22 +235,22 @@ export default function ChecklistPage() {
                   onChange={e => setNewTask(p => ({ ...p, details: e.target.value }))}
                   rows={2} style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit", resize: "vertical" }} />
               </div>
-              <div>
+              <div style={{ gridColumn: "1 / 2" }}>
                 <label style={{ display: "block", fontSize: "11px", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "6px" }}>Due Date</label>
                 <input type="date" value={newTask.due_date}
                   onChange={e => setNewTask(p => ({ ...p, due_date: e.target.value }))}
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit" }} />
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
-              <div>
+              <div style={{ gridColumn: "2 / 3" }}>
                 <label style={{ display: "block", fontSize: "11px", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "6px" }}>Assigned To</label>
                 <input type="text" placeholder="Me, Partner, Lawyer..." value={newTask.assigned_to}
                   onChange={e => setNewTask(p => ({ ...p, assigned_to: e.target.value }))}
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit" }} />
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
-              <div>
+              <div style={{ gridColumn: "1 / 2" }}>
                 <label style={{ display: "block", fontSize: "11px", fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "#6B8BA8", marginBottom: "6px" }}>Category</label>
                 <select value={newTask.category} onChange={e => setNewTask(p => ({ ...p, category: e.target.value }))}
-                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit" }}>
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1px solid #C8DFF0", fontSize: "14px", color: "#083358", background: "#EDF4FB", outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}>
                   {["Legal", "Banking", "Housing", "Health", "School", "Tax", "Admin", "Moving", "Other"].map(c => (
                     <option key={c} value={c}>{c}</option>
                   ))}
