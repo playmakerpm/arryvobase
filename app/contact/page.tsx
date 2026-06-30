@@ -1,3 +1,4 @@
+import Footer from "@/components/footer";
 "use client";
 
 import { useState } from "react";
@@ -97,12 +98,9 @@ export default function ContactPage() {
           </form>
         )}
 
-        <div style={{ marginTop: "40px", paddingTop: "32px", borderTop: "1px solid #C8DFF0", textAlign: "center" }}>
-          <p style={{ fontSize: "13px", color: "#6B8BA8" }}>
-            Prefer email? Reach us directly at <a href="mailto:hello@arryvobase.com" style={{ color: "#0569B8", fontWeight: 600 }}>hello@arryvobase.com</a>
-          </p>
-        </div>
+
       </div>
+      <Footer />
     </main>
   );
 }

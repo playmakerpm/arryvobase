@@ -1,3 +1,4 @@
+import Footer from "@/components/footer";
 export default function PartnersPage() {
   const pStyle = { fontSize: "15px", color: "#2E4A68", lineHeight: 1.8, fontWeight: 300, marginBottom: "16px" };
 
@@ -61,6 +62,7 @@ export default function PartnersPage() {
           </a>
         </div>
       </div>
+      <Footer />
     </main>
   );
 }

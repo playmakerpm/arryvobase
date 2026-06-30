@@ -97,26 +97,87 @@ export default function HomePage() {
       </section>
 
       {/* How it works */}
-      <section id="how" style={{ background: "#020D1C", padding: "96px 48px" }}>
+      <section id="how" style={{ padding: "96px 48px", background: "white" }}>
         <div style={{ maxWidth: "1060px", margin: "0 auto" }}>
-          <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: ".15em", textTransform: "uppercase", color: "#00B9D1", marginBottom: "16px" }}>How Arryvo Base works</div>
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "48px", fontWeight: 600, lineHeight: 1.05, letterSpacing: "-.025em", color: "#C8EEF5", marginBottom: "16px" }}>
-            From overwhelmed to{" "}
-            <em style={{ fontStyle: "italic", color: "#5DD3E3" }}>organized</em> in minutes.
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1px", marginTop: "56px", background: "rgba(255,255,255,.06)", borderRadius: "16px", overflow: "hidden" }}>
-            {[
-              { n: "01", icon: "🗺️", title: "Choose your destination", desc: "Select your country and visa type. Arryvo Base instantly builds a personalized checklist — every step in the right order for your situation." },
-              { n: "02", icon: "⚡", title: "Work your command center", desc: "Progress through phases. Save documents, mark tasks done, and surface the right vendors exactly when you need them." },
-              { n: "03", icon: "🤝", title: "Build your provider network", desc: "Save lawyers, insurers, and banks to your personal directory. Track every vendor from first contact to hired." },
-            ].map((s) => (
-              <div key={s.n} style={{ padding: "44px 34px", background: "rgba(255,255,255,.02)" }}>
-                <div style={{ fontFamily: "Georgia, serif", fontSize: "64px", fontWeight: 700, color: "rgba(0,185,209,.08)", lineHeight: 1, marginBottom: "20px" }}>{s.n}</div>
-                <div style={{ fontSize: "24px", marginBottom: "16px" }}>{s.icon}</div>
-                <div style={{ fontSize: "17px", fontWeight: 600, color: "#C8EEF5", marginBottom: "10px" }}>{s.title}</div>
-                <div style={{ fontSize: "13px", fontWeight: 300, color: "rgba(200,238,245,.45)", lineHeight: 1.75 }}>{s.desc}</div>
-              </div>
-            ))}
+          <div style={{ textAlign: "center", marginBottom: "64px" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#EDF4FB", border: "1px solid #C8DFF0", color: "#0569B8", fontSize: "11px", fontWeight: 600, letterSpacing: ".13em", textTransform: "uppercase", padding: "6px 14px", borderRadius: "20px", marginBottom: "20px" }}>
+              How it works
+            </div>
+            <h2 style={{ fontFamily: "Georgia, serif", fontSize: "48px", fontWeight: 600, lineHeight: 1.05, letterSpacing: "-.025em", color: "#083358", marginBottom: "16px" }}>
+              From overwhelmed to{" "}
+              <em style={{ fontStyle: "italic", color: "#0569B8" }}>organized</em> in minutes.
+            </h2>
+            <p style={{ fontSize: "16px", fontWeight: 300, color: "#6B8BA8", maxWidth: "520px", margin: "0 auto", lineHeight: 1.75 }}>
+              Three steps from signup to a fully structured relocation plan built around your visa and destination.
+            </p>
+          </div>
+
+          {/* Steps */}
+          <div style={{ position: "relative" }}>
+            {/* Connector line */}
+            <div style={{ position: "absolute", top: "40px", left: "calc(16.67% + 20px)", right: "calc(16.67% + 20px)", height: "1px", background: "linear-gradient(90deg, #C8DFF0, #0569B8, #C8DFF0)", zIndex: 0 }} />
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "32px", position: "relative", zIndex: 1 }}>
+              {[
+                {
+                  n: "01",
+                  icon: "🗺️",
+                  color: "#0569B8",
+                  bg: "#EDF4FB",
+                  title: "Choose your destination",
+                  desc: "Select your country and visa type. We instantly generate a personalized checklist with every step in the right order for your exact situation.",
+                  tag: "Takes 30 seconds",
+                },
+                {
+                  n: "02",
+                  icon: "⚡",
+                  color: "#00B9D1",
+                  bg: "#E8F9FC",
+                  title: "Work your command center",
+                  desc: "Progress through phases. Check off tasks, upload documents, and surface the right vendors at exactly the right moment in your relocation.",
+                  tag: "Track everything",
+                },
+                {
+                  n: "03",
+                  icon: "🤝",
+                  color: "#083358",
+                  bg: "#EDF4FB",
+                  title: "Build your provider network",
+                  desc: "Save lawyers, insurers, and banks to your personal directory. Track every vendor from first contact to hired — all in one place.",
+                  tag: "Stay organized",
+                },
+              ].map((s) => (
+                <div key={s.n} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+                  {/* Step circle */}
+                  <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: s.bg, border: `2px solid ${s.color}30`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "28px", position: "relative", boxShadow: `0 0 0 8px ${s.bg}` }}>
+                    <span style={{ fontSize: "32px" }}>{s.icon}</span>
+                    <div style={{ position: "absolute", top: "-6px", right: "-6px", width: "24px", height: "24px", borderRadius: "50%", background: s.color, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ fontSize: "10px", fontWeight: 800, color: "white" }}>{s.n}</span>
+                    </div>
+                  </div>
+
+                  {/* Card */}
+                  <div style={{ background: "white", border: "1px solid #C8DFF0", borderRadius: "16px", padding: "28px 24px", width: "100%", boxShadow: "0 4px 24px rgba(5,105,184,.06)" }}>
+                    <div style={{ display: "inline-block", fontSize: "10px", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: s.color, background: s.bg, padding: "4px 10px", borderRadius: "20px", marginBottom: "14px" }}>
+                      {s.tag}
+                    </div>
+                    <h3 style={{ fontFamily: "Georgia, serif", fontSize: "19px", fontWeight: 600, color: "#083358", marginBottom: "10px", lineHeight: 1.3 }}>
+                      {s.title}
+                    </h3>
+                    <p style={{ fontSize: "13px", color: "#6B8BA8", lineHeight: 1.7, fontWeight: 300, margin: 0 }}>
+                      {s.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <div style={{ textAlign: "center", marginTop: "56px" }}>
+            <a href="/sign-up" style={{ display: "inline-block", fontSize: "14px", fontWeight: 600, color: "white", background: "linear-gradient(135deg, #0569B8, #00B9D1)", padding: "14px 32px", borderRadius: "12px", textDecoration: "none" }}>
+              Start your relocation plan →
+            </a>
           </div>
         </div>
       </section>

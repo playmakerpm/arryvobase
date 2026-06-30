@@ -1,3 +1,4 @@
+import Footer from "@/components/footer";
 export default function AboutPage() {
   const pStyle = { fontSize: "16px", color: "#2E4A68", lineHeight: 1.85, fontWeight: 300, marginBottom: "20px" };
 
@@ -68,6 +69,7 @@ export default function AboutPage() {
           </a>
         </div>
       </div>
+      <Footer />
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import Footer from "@/components/footer";
 export default function PrivacyPage() {
   const sectionStyle = { marginBottom: "32px" };
   const h2Style = { fontFamily: "Georgia, serif", fontSize: "22px", fontWeight: 600, color: "#083358", marginBottom: "12px" };
@@ -123,6 +124,7 @@ export default function PrivacyPage() {
           </p>
         </div>
       </div>
+      <Footer />
     </main>
   );
 }
