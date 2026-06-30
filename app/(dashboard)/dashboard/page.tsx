@@ -24,7 +24,7 @@ const PHASES = [
 const TOTAL_FREE = 7;
 const TOTAL_TASKS = 22;
 
-export default function DashboardPage({ searchParams }: { searchParams: any }) {
+export default function DashboardPage() {
   const { user } = useUser();
   const firstName = user?.firstName || "there";
   const [completedCount, setCompletedCount] = useState(0);
@@ -34,7 +34,9 @@ export default function DashboardPage({ searchParams }: { searchParams: any }) {
     if (!user) return;
     const load = async () => {
       // If returning from successful Stripe checkout, update plan to pro
-      if (searchParams?.upgraded) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const upgraded = urlParams.get("upgraded");
+      if (upgraded === "true") {
         await supabase
           .from("users")
           .upsert({
@@ -68,7 +70,7 @@ export default function DashboardPage({ searchParams }: { searchParams: any }) {
 
   return (
     <div style={{ padding: "40px 48px", maxWidth: "1100px", margin: "0 auto" }}>
-      {searchParams?.upgraded && (
+      {typeof window !== "undefined" && new URLSearchParams(window.location.search).get("upgraded") === "true" && (
         <div style={{ marginBottom: "24px", padding: "16px 20px", borderRadius: "12px", background: "linear-gradient(135deg, #0569B8, #00B9D1)", color: "white", fontSize: "14px", fontWeight: 600 }}>
           🎉 Welcome to Arryvo Base Pro! All features are now unlocked.
         </div>
