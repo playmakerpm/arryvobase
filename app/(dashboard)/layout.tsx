@@ -1,5 +1,43 @@
+"use client";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+function UpgradeCTA() {
+  const { user } = useUser();
+  const [isPro, setIsPro] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    // Check URL for upgrade param
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("upgraded") === "true") {
+      setIsPro(true);
+      return;
+    }
+    supabase.from("users").select("plan").eq("clerk_user_id", user.id).single().then(({ data }) => {
+      if (data?.plan === "pro") setIsPro(true);
+    });
+  }, [user]);
+
+  if (isPro) return (
+    <div style={{ background: "rgba(0,185,209,.15)", border: "1px solid rgba(0,185,209,.3)", borderRadius: "12px", padding: "14px", marginBottom: "12px", textAlign: "center" }}>
+      <div style={{ fontSize: "12px", fontWeight: 700, color: "#00B9D1", marginBottom: "2px" }}>✓ Pro Plan Active</div>
+      <div style={{ fontSize: "11px", color: "rgba(200,238,245,.4)" }}>All features unlocked</div>
+    </div>
+  );
+
+  return (
+    <div style={{ background: "linear-gradient(135deg, #0569B8, #00B9D1)", borderRadius: "12px", padding: "16px", marginBottom: "12px" }}>
+      <div style={{ fontSize: "13px", fontWeight: 700, color: "white", marginBottom: "4px" }}>Upgrade to Pro</div>
+      <div style={{ fontSize: "12px", color: "rgba(255,255,255,.7)", marginBottom: "12px", lineHeight: 1.4 }}>Unlock all countries, full checklist & document vault</div>
+      <Link href="/upgrade" style={{ display: "block", textAlign: "center", fontSize: "12px", fontWeight: 700, padding: "9px", borderRadius: "8px", background: "white", color: "#0569B8", textDecoration: "none" }}>
+        $19/month →
+      </Link>
+    </div>
+  );
+}
 
 const NAV_ITEMS = [
   { href: "/dashboard",  label: "Dashboard",  emoji: "⊞" },
@@ -34,13 +72,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           ))}
         </nav>
         <div style={{ padding: "16px" }}>
-          <div style={{ background: "linear-gradient(135deg, #0569B8, #00B9D1)", borderRadius: "12px", padding: "16px", marginBottom: "12px" }}>
-            <div style={{ fontSize: "13px", fontWeight: 700, color: "white", marginBottom: "4px" }}>Upgrade to Pro</div>
-            <div style={{ fontSize: "12px", color: "rgba(255,255,255,.7)", marginBottom: "12px", lineHeight: 1.4 }}>Unlock all countries, full checklist & document vault</div>
-            <Link href="/upgrade" style={{ display: "block", textAlign: "center", fontSize: "12px", fontWeight: 700, padding: "9px", borderRadius: "8px", background: "white", color: "#0569B8", textDecoration: "none" }}>
-              $19/month →
-            </Link>
-          </div>
+          <UpgradeCTA />
           <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 4px" }}>
             <UserButton />
             <span style={{ fontSize: "13px", color: "#2E4A68", fontWeight: 500 }}>My Account</span>
